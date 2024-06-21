@@ -212,8 +212,8 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
         if (directorid) {
           if (directorid.length > 15) {
             validationErrors.directorid = 'Должно быть не более 15 символов в длину';
-          } else if (/\d/.test(directorid)) {
-            validationErrors.directorid = 'Имя не должно содержать цифры';
+          } else if (!/^\d+$/.test(directorid)) {
+            validationErrors.directorid = 'Имя не должно содержать символы';
           }
         } else {
           validationErrors.directorid = 'Это поле обязательно для заполнения';
