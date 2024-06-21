@@ -1,0 +1,76 @@
+Полный список маршрутов
+Вот полный список маршрутов для вашего проекта:
+
+Создание магазина:
+
+Метод: POST
+URL: /stores
+Тело запроса: { "storename": "string", "address": "string" }
+Получение всех магазинов:
+
+Метод: GET
+URL: /stores
+Обновление магазина:
+
+Метод: PUT
+URL: /stores/:id
+Тело запроса: { "storename": "string", "address": "string" }
+Удаление магазина:
+
+Метод: DELETE
+URL: /stores/:id
+Создание сотрудника:
+
+Метод: POST
+URL: /employees
+Тело запроса: { "firstname": "string", "lastname": "string", "middlename": "string", "positionid": "int", "storeid": "int" }
+Получение всех сотрудников:
+
+Метод: GET
+URL: /employees
+Обновление сотрудника:
+
+Метод: PUT
+URL: /employees/:id
+Тело запроса: { "firstname": "string", "lastname": "string", "middlename": "string", "positionid": "int", "storeid": "int" }
+Удаление сотрудника:
+
+Метод: DELETE
+URL: /employees/:id
+Создание продукта:
+
+Метод: POST
+URL: /products
+Тело запроса: { "productname": "string" }
+Получение всех продуктов:
+
+Метод: GET
+URL: /products
+Обновление продукта:
+
+Метод: PUT
+URL: /products/:id
+Тело запроса: { "productname": "string" }
+Удаление продукта:
+
+Метод: DELETE
+URL: /products/:id
+Создание роли:
+
+Метод: POST
+URL: /positions
+Тело запроса: { "positionname": "string" }
+Получение всех ролей:
+
+Метод: GET
+URL: /positions
+Обновление роли:
+
+Метод: PUT
+URL: /positions/:id
+Тело запроса: { "positionname": "string" }
+Удаление роли:
+
+Метод: DELETE
+URL: /positions/:id
+Теперь вы можете настроить эти маршруты в Insomnia или другом инструменте для тестирования API.

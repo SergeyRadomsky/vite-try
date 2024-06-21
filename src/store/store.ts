@@ -1,7 +1,12 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore } from '@reduxjs/toolkit';
+import tableReducer from './tableSlice';
 
-export default configureStore({
+const store = configureStore({
   reducer: {
-    todos: todos.reducer,
+    table: tableReducer,
   },
-})
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+export default store;
