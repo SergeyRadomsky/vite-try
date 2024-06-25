@@ -28,6 +28,10 @@ Employees.init({
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  bod: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
 }, {
   sequelize,
   modelName: 'employees',

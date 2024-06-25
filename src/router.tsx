@@ -13,6 +13,7 @@ const router = createBrowserRouter([
       { path: 'employees', element: <DynamicTable tableName="employees" /> },
       { path: 'products', element: <DynamicTable tableName="products" /> },
       { path: 'positions', element: <DynamicTable tableName="positions" /> },
+      { path: 'storeproduct', element: <DynamicTable tableName="storeproduct" /> },
     ],
   },
 ]);
