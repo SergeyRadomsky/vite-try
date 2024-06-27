@@ -8,7 +8,6 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import CancelIcon from '@mui/icons-material/Cancel';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { findSourceMap } from 'module';
 
 interface DynamicTableProps {
   tableName: string;
@@ -32,7 +31,6 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
-    console.log('Fetching data', tableName);
     dispatch(fetchTableData(tableName));
   }, [dispatch, tableName]);
 
@@ -57,7 +55,6 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
   };
 
   const handleDeleteRecord = async (id: any) => {
-    console.log(`Deleting record with id: ${id}`);
     try {
       const response = await fetch(`/api/${tableName}/${id}`, {
         method: 'DELETE',
@@ -99,11 +96,8 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
 
   const handleAddRecord = async () => {
     try {
-      console.log(newRow);
-  
       const { firstname, lastname, surname, positionid, storeid, positionname, productname, storename, address, directorid } = newRow ?? {};
       let validationErrors = {};
-  
       if (tableName === 'employees') {
         if (firstname) {
           if (firstname.length > 15) {
@@ -114,7 +108,7 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
         } else {
           validationErrors.firstname = 'Это поле обязательно для заполнения';
         }
-  
+
         if (lastname) {
           if (lastname.length > 15) {
             validationErrors.lastname = 'Должно быть не более 15 символов в длину';
@@ -124,7 +118,7 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
         } else {
           validationErrors.lastname = 'Это поле обязательно для заполнения';
         }
-  
+
         if (surname) {
           if (surname.length > 15) {
             validationErrors.surname = 'Должно быть не более 15 символов в длину';
@@ -138,7 +132,7 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
           if (positionid.length > 15) {
             validationErrors.positionid = 'Должно быть не более 15 символов в длину';
           } else if (!/^\d+$/.test(positionid)) {
-            validationErrors.positionid = 'Имя не должно содержать символы';	
+            validationErrors.positionid = 'Имя не должно содержать символы';  
           }
         } else {
           validationErrors.positionid = 'Это поле обязательно для заполнения';
@@ -147,13 +141,13 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
           if (storeid.length > 15) {
             validationErrors.storeid = 'Должно быть не более 15 символов в длину';
           } else if (!/^\d+$/.test(storeid)) {
-            validationErrors.storeid = 'Имя не должно содержать символы';	
+            validationErrors.storeid = 'Имя не должно содержать символы';  
           }
         } else {
           validationErrors.storeid = 'Это поле обязательно для заполнения';
         }
       }
-  
+
       if (tableName === 'positions') {
         if (positionname) {
           if (positionname.length > 15) {
@@ -170,7 +164,7 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
           validationErrors.positionname = 'Это поле обязательно для заполнения';
         }
       }
-  
+
       if (tableName === 'products') {
         if (productname) {
           if (productname.length > 15) {
@@ -198,7 +192,7 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
         } else {
           validationErrors.storename = 'Это поле обязательно для заполнения';
         }
-  
+
         if (address) {
           if (address.length > 15) {
             validationErrors.address = 'Должно быть не более 50 символов в длину';
@@ -208,7 +202,7 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
         } else {
           validationErrors.address = 'Это поле обязательно для заполнения';
         }
-  
+
         if (directorid) {
           if (directorid.length > 15) {
             validationErrors.directorid = 'Должно быть не более 15 символов в длину';
@@ -220,14 +214,14 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
         }
       }
       
-  
+
       if (Object.keys(validationErrors).length > 0) {
         setErrors(validationErrors);
         return;
       }
-  
+
       setErrors({});
-  
+
       const response = await fetch(`/api/${tableName}`, {
         method: 'POST',
         headers: {
@@ -235,7 +229,7 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
         },
         body: JSON.stringify(newRow),
       });
-  
+
       if (response.ok) {
         dispatch(fetchTableData(tableName));
         setNewRow({});
@@ -247,7 +241,7 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
       console.error('Error adding new record:', error);
     }
   };
-  
+
 
   const handleCancelAdd = () => {
     setIsAdding(false);
@@ -400,6 +394,8 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ tableName }) => {
                         />
                       )
                     ) : (
+                      column === 'store' ? row.store.storename :
+                      column === 'position' ? row.position.positionname :
                       row[column]
                     )}
                   </TableCell>
