@@ -1,12 +1,11 @@
 import { Router } from 'express';
-import { getStores, createStore, deleteStore, updateStore, getStoreEmployees } from '../controllers/storesController';
+import { getStores, createStore, updateStore, deleteStore } from '../controllers/storesController';
 
 const router = Router();
 
 router.get('/', getStores);
-router.post('/', createStore);
-router.delete('/:storeid', deleteStore);
-router.put('/:storeid', updateStore);
-router.get('/:identifier/employees', getStoreEmployees);
+router.post('/stores', createStore);
+router.put('/:id', updateStore);
+router.delete('/:id', deleteStore);
 
 export default router;

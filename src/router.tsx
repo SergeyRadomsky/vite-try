@@ -1,7 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Layout from './layout';
-import Home from './pages/Home/Home';
+// import Home from './pages/Home/Home';
 import EmployeesTable from './components/tables/EmployeesTable/EmployeesTable';
+import PositionsTable from './components/tables/PositionsTable/PositionsTable';
+import ProductsTable from './components/tables/ProductsTable/ProductsTable';
+import StoresTable from './components/tables/StoresTable/StoresTable';
+import StoreProductsTable from './components/tables/StoreProductsTable/StoreProductTable';
 
 
 const router = createBrowserRouter([
@@ -9,12 +13,13 @@ const router = createBrowserRouter([
     path: '/',
     element: <Layout />,
     children: [
-      { path: '/', element: <Home /> },
+      // { path: '/', element: <StoresTable />},
       { path: '/employees', element: <EmployeesTable /> },
-      // { path: '/stores', element: <StoresTable /> },
-      // { path: '/products', element: <ProductsTable /> },
-      // { path: '/positions', element: <PositionsTable /> },
-      // { path: '/store-products', element: <StoreProductsTable /> },
+      { path: '/positions', element: <PositionsTable /> },
+      { path: '/products', element: <ProductsTable /> },
+      { path: '/stores', element: <StoresTable /> },
+      { path: '/store-products', element: <StoreProductsTable /> },
+      // { path: '/', element: <StoresTable /> },
     ],
   },
 ]);

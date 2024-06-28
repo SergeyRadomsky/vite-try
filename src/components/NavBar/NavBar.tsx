@@ -24,10 +24,11 @@ const Navbar = () => {
       <AppBar style={{ backgroundColor: isDarkMode ? '#555' : '#3f51b5' }}>
         <Toolbar className={s.navbar}>
           <ButtonGroup>
-            <a href="/"> <Button variant="text" className={s.navBtn}>Stores</Button></a>
+            <a href="/stores"> <Button variant="text" className={s.navBtn}>Stores</Button></a>
             <a href="/employees"> <Button variant="text" className={s.navBtn}>Employees</Button></a>
             <a href="/products"> <Button variant="text" className={s.navBtn}>Products</Button></a>
             <a href="/positions"> <Button variant="text" className={s.navBtn}>Positions</Button></a>
+            <a href="/store-products"> <Button variant="text" className={s.navBtn}>Store products</Button></a>
           </ButtonGroup>
           <Button variant="text" className={s.navBtn} onClick={toggleDarkMode}>
             {isDarkMode ? 'Light mode' : 'Dark mode'}

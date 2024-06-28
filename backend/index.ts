@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 // Подключаем маршруты
 app.use("/employees", employeesRoutes);
 app.use("/stores", storesRoutes);
+app.use("/", storesRoutes);
 app.use("/positions", positionsRoutes);
 app.use("/products", productsRoutes);
 app.use("/store-products", storeProductsRoutes);

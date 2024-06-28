@@ -2,43 +2,95 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // import { RootState } from '../../store/employees/selector';
 
-export const fetchEmployees = createAsyncThunk('employees/fetchEmployees', async () => {
-  const response = await fetch('/api/employees');
-  const data = await response.json();
-  return data;
-});
 
 export interface Employee {
   employeeid: number;
-  firstname:  string;
-  lastname:   string;
-  surname:    string;
+  firstname: string;
+  lastname: string;
+  surname: string;
   positionid: number;
-  storeid:    number;
-  bod:        Date;
-  position:   Position;
-  store:      Store;
+  storeid: number;
+  bod: Date;
+  position: { id: number; positionname: string };
+  store: { id: number; storename: string };
+}
+export type CreateEmployee = {
+  employeeid: number;
+  firstname: string;
+  lastname: string;
+  surname: string;
+  positionid: number;
+  storeid: number;
+  bod: Date;
+  position: { id: number; positionname: string };
+  store: { id: number; storename: string };
 }
 
-export interface Position {
-  positionname: string;
-}
+// export interface Position {
+//   positionname: string;
+// }
 
-export interface Store {
-  storename: string;
-}
-
+// export interface Store {
+//   storename: string;
+// }
 
 interface State {
-  data: Employee[];
+  data: {
+    data: Employee[];
+    count: number;
+  };
   loading: boolean;
   error?: string;
 }
 
 const initialState: State = {
-  data: [],
+  data: {
+    data: [],
+    count: 0,
+  },
   loading: false,
 };
+
+export const fetchEmployees = createAsyncThunk(
+  'employees/fetchEmployees',
+  async (params: { limit: number; offset: number }) => {
+    const { limit, offset } = params;
+    const response = await fetch(`/api/employees?limit=${limit}&offset=${offset}`);
+    const data = await response.json();
+    return data;
+  }
+);
+
+export const createEmployee = createAsyncThunk('employees/createEmployee', async (employee: Omit<Employee, 'employeeid'>) => {
+  const response = await fetch('/api/employees', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(employee),
+  });
+  const data = await response.json();
+  return data;
+});
+
+export const updateEmployee = createAsyncThunk('employees/updateEmployee', async (employee: Employee) => {
+  const response = await fetch(`/api/employees/${employee.employeeid}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(employee),
+  });
+  const data = await response.json();
+  return data;
+});
+
+export const deleteEmployee = createAsyncThunk('employees/deleteEmployee', async (employeeid: number) => {
+  await fetch(`/api/employees/${employeeid}`, {
+    method: 'DELETE',
+  });
+  return employeeid;
+});
 
 
 const employeesSlice = createSlice({
@@ -58,12 +110,20 @@ const employeesSlice = createSlice({
       .addCase(fetchEmployees.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
+      })
+      .addCase(createEmployee.fulfilled, (state, action) => {
+        state.data.data.push(action.payload);
+      })
+      .addCase(updateEmployee.fulfilled, (state, action) => {
+        const index = state.data.data.findIndex((employee) => employee.employeeid === action.payload.employeeid);
+        if (index !== -1) {
+          state.data.data[index] = action.payload;
+        }
+      })
+      .addCase(deleteEmployee.fulfilled, (state, action) => {
+        state.data.data = state.data.data.filter((employee) => employee.employeeid !== action.payload);
       });
   },
 });
 
 export default employeesSlice.reducer;
-
-// store/employees/selector.ts
-
-// export const selectEmployees = (state: RootState) => state.employees;

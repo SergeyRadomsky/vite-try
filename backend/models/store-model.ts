@@ -1,29 +1,33 @@
-import { sequelize } from './../sequelize';
-import { DataTypes, Model } from 'sequelize';
+import { sequelize } from "./../sequelize";
+import { Model, DataTypes } from "sequelize";
 
-class Stores extends Model {}
+class Store extends Model {}
 
-Stores.init({
-  storeid: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
+Store.init(
+  {
+    storeid: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    storename: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    directorid: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
-  storename: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  address: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  directorid: {
-    type: DataTypes.INTEGER,
-  },
-}, {
-  sequelize,
-  modelName: 'stores',
-  timestamps: false, // Отключение временных меток
-});
+  {
+    sequelize,
+    tableName: "stores",
+    timestamps: false, // Отключение временных меток
+  }
+);
 
-export default Stores;
+export default Store;

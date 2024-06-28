@@ -1,79 +1,46 @@
 import { Request, Response } from 'express';
-import { Stores, Employees } from '../models';
+import Store from '../models/store-model';
 
-// Получение всех магазинов
 export const getStores = async (req: Request, res: Response) => {
   try {
-    const stores = await Stores.findAll();
+    const stores = await Store.findAll();
     res.json(stores);
   } catch (error) {
-    res.status(500).send('Server Error');
+    res.status(500).json({ message: 'Failed to fetch stores' });
   }
 };
 
-// Создание нового магазина
 export const createStore = async (req: Request, res: Response) => {
   try {
-    const newStore = await Stores.create(req.body);
-    res.json(newStore);
+    const store = await Store.create(req.body);
+    res.json(store);
   } catch (error) {
-    res.status(400).json({ error: 'Validation Error' });
+    res.status(500).json({ message: 'Failed to create store' });
   }
 };
 
-// Удаление магазина
-export const deleteStore = async (req: Request, res: Response) => {
-  const { storeid } = req.params;
-  try {
-    const store = await Stores.findByPk(storeid);
-    if (!store) {
-      return res.status(404).json({ error: 'Store not found' });
-    }
-    await store.destroy();
-    res.json({ message: 'Store deleted successfully' });
-  } catch (error) {
-    res.status(500).send('Server Error');
-  }
-};
-
-// Редактирование магазина
 export const updateStore = async (req: Request, res: Response) => {
-  const { storeid } = req.params;
   try {
-    const store = await Stores.findByPk(storeid);
+    const store = await Store.findByPk(req.params.id);
     if (!store) {
-      return res.status(404).json({ error: 'Store not found' });
+      return res.status(404).json({ message: 'Store not found' });
     }
     await store.update(req.body);
     res.json(store);
   } catch (error) {
-    res.status(400).json({ error: 'Validation Error' });
+    res.status(500).json({ message: 'Failed to update store' });
   }
 };
 
-// Получение сотрудников магазина по ID или названию магазина
-export const getStoreEmployees = async (req: Request, res: Response) => {
-  const { identifier } = req.params;
+export const deleteStore = async (req: Request, res: Response) => {
   try {
-      let store;
-      const numericIdentifier = parseInt(identifier, 10);
-
-      if (isNaN(numericIdentifier)) {
-          // Если идентификатор не число, ищем по названию
-          store = await Stores.findOne({ where: { storename: identifier } });
-      } else {
-          // Если идентификатор число, ищем по ID
-          store = await Stores.findOne({ where: { storeid: numericIdentifier } });
-      }
-
-      if (!store) {
-          return res.status(404).send('Store not found');
-      }
-
-      const employees = await Employees.findAll({ where: { storeid: store.storeid } });
-      res.json(employees);
+    const store = await Store.findByPk(req.params.id);
+    if (!store) {
+      return res.status(404).json({ message: 'Store not found' });
+    }
+    await store.destroy();
+    res.json({ message: 'Store deleted' });
   } catch (error) {
-      console.error(error);
-      res.status(500).send('Server Error');
+    res.status(500).json({ message: 'Failed to delete store' });
   }
 };

@@ -1,9 +1,9 @@
 import { sequelize } from './../sequelize';
 import { DataTypes, Model } from 'sequelize';
 
-class Positions extends Model {}
+class Position extends Model {}
 
-Positions.init({
+Position.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -19,4 +19,4 @@ Positions.init({
   timestamps: false, // Отключение временных меток
 });
 
-export default Positions;
+export default Position;
