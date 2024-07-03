@@ -1,4 +1,3 @@
-// routes/employeesRoutes.ts
 import { Router } from 'express';
 import { getEmployees, createEmployee, updateEmployee, deleteEmployee } from '../controllers/employeesController';
 

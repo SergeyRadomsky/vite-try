@@ -1,6 +1,7 @@
-// controllers/employeesController.ts
 import { Request, Response } from "express";
 import { Employees, Positions, Stores } from "../models";
+import { employeeValidationRules } from "../validators/employeeValidator";
+import { validate } from "../middlewares/validate";
 
 // Получение всех сотрудников с названиями магазинов и должностей
 export const getEmployees = async (req: Request, res: Response) => {
@@ -23,37 +24,46 @@ export const getEmployees = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log(error);
-
     res.status(500).send("Server Error");
   }
 };
 
 // Создание нового сотрудника
-export const createEmployee = async (req: Request, res: Response) => {
-  try {
-    const newEmployee = await Employees.create(req.body);
-    res.json(newEmployee);
-  } catch (error) {
-    res.status(400).json({ error: "Validation Error" });
+export const createEmployee = [
+  ...employeeValidationRules(),
+  validate,
+  async (req: Request, res: Response) => {
+    try {
+      const newEmployee = await Employees.create(req.body);
+      res.json(newEmployee);
+    } catch (error) {
+      res.status(400).json({ error: "Validation Error" });
+    }
   }
-};
+];
 
-export const updateEmployee = async (req: Request, res: Response) => {
-  try {
-    const { employeeid } = req.params;
-    await Employees.update(req.body, {
-      where: { employeeid },
-      returning: true,
-    });
+export const updateEmployee = [
+  ...employeeValidationRules(),
+  validate,
+  async (req: Request, res: Response) => {
+    try {
+      const { employeeid } = req.params;
+      await Employees.update(req.body, {
+        where: { employeeid },
+        returning: true,
+      });
 
-    const updatedEmployee = await Employees.findByPk(employeeid, {
-      include: [{ association: "position" }, { association: "store" }],
-    });
-    res.json(updatedEmployee);
-  } catch (error) {
-    res.status(400).json({ error: "Validation Error" });
+      const updatedEmployee = await Employees.findByPk(employeeid, {
+        include: [{ association: "position" }, { association: "store" }],
+      });
+      res.json(updatedEmployee);
+    } catch (error) {
+      console.log(error);
+      
+      res.status(400).json({ error: "Validation Error" });
+    }
   }
-};
+];
 
 export const deleteEmployee = async (req: Request, res: Response) => {
   try {

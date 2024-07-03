@@ -129,7 +129,7 @@ const EmployeesTable: React.FC = () => {
           firstname: editFirstname,
           lastname: editLastname,
           surname: editSurname,
-          bod: new Date(editBod),
+          bod: new Date(editBod).toISOString().slice(0,10),
           positionid: editPositionId!,
           storeid: editStoreId!,
         })

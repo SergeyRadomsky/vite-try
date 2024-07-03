@@ -10,7 +10,7 @@ export interface Employee {
   surname: string;
   positionid: number;
   storeid: number;
-  bod: Date;
+  bod: any;
   position: { id: number; positionname: string };
   store: { id: number; storename: string };
 }
@@ -21,7 +21,7 @@ export type CreateEmployee = {
   surname: string;
   positionid: number;
   storeid: number;
-  bod: Date;
+  bod: string;
   position: { id: number; positionname: string };
   store: { id: number; storename: string };
 }
@@ -61,7 +61,7 @@ export const fetchEmployees = createAsyncThunk(
   }
 );
 
-export const createEmployee = createAsyncThunk('employees/createEmployee', async (employee: Omit<Employee, 'employeeid'>) => {
+export const createEmployee = createAsyncThunk('employees/createEmployee', async (employee: Omit<Employee, 'employeeid' | 'position' | 'store'>) => {
   const response = await fetch('/api/employees', {
     method: 'POST',
     headers: {
@@ -73,7 +73,7 @@ export const createEmployee = createAsyncThunk('employees/createEmployee', async
   return data;
 });
 
-export const updateEmployee = createAsyncThunk('employees/updateEmployee', async (employee: Employee) => {
+export const updateEmployee = createAsyncThunk('employees/updateEmployee', async (employee: Partial<Employee>) => {
   const response = await fetch(`/api/employees/${employee.employeeid}`, {
     method: 'PUT',
     headers: {

@@ -55,7 +55,7 @@ const StoresTable: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchStores());
-    dispatch(fetchEmployees());
+    dispatch(fetchEmployees({limit: 0, offset: 0}));
   }, [dispatch]);
 
   const handleCreate = () => {
@@ -246,10 +246,10 @@ const StoresTable: React.FC = () => {
                     </MenuItem> */}
                     {[
                       ...new Set(
-                        employees.map((employee) => employee.employeeid)
+                        employees.data.map((employee) => employee.employeeid)
                       ),
                     ].map((uniqueId) => {
-                      const employee = employees.find(
+                      const employee = employees.data.find(
                         (emp) => emp.employeeid === uniqueId
                       );
                       return (
@@ -320,7 +320,7 @@ const StoresTable: React.FC = () => {
     <MenuItem value="">
       <em>None</em>
     </MenuItem>
-    {employees.map((employee) => (
+    {employees.data.map((employee) => (
       <MenuItem
         key={employee.employeeid}
         value={employee.employeeid}
@@ -336,17 +336,17 @@ const StoresTable: React.FC = () => {
 
 
                 ) : store.directorid &&
-                  employees.find(
+                  employees.data.find(
                     (emp) => emp.employeeid === store.directorid
                   ) ? (
                   `${
-                    employees.find((emp) => emp.employeeid === store.directorid)
+                    employees.data.find((emp) => emp.employeeid === store.directorid)
                       ?.surname
                   } ${
-                    employees.find((emp) => emp.employeeid === store.directorid)
+                    employees.data.find((emp) => emp.employeeid === store.directorid)
                       ?.firstname[0]
                   }.${
-                    employees.find((emp) => emp.employeeid === store.directorid)
+                    employees.data.find((emp) => emp.employeeid === store.directorid)
                       ?.lastname[0]
                   }.`
                 ) : (
@@ -421,7 +421,7 @@ const StoresTable: React.FC = () => {
                     <MenuItem value="">
                       <em>None</em>
                     </MenuItem>
-                    {employees.map((employee) => (
+                    {employees.data.map((employee) => (
                       <MenuItem
                         key={employee.employeeid}
                         value={employee.employeeid}
@@ -480,7 +480,7 @@ const StoresTable: React.FC = () => {
         {filterDirectorId && (
           <Chip
             label={`Director: ${
-              employees.find((emp) => emp.employeeid === filterDirectorId)
+              employees.data.find((emp) => emp.employeeid === filterDirectorId)
                 ?.surname
             }`}
             onDelete={() => handleDeleteFilter("Director")}
