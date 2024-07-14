@@ -11,6 +11,20 @@ export const getPositions = async (req: Request, res: Response) => {
   }
 };
 
+// Получение одной роли по id
+export const getPositionById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const position = await Positions.findByPk(id);
+    if (!position) {
+      return res.status(404).send('Position not found');
+    }
+    res.json(position);
+  } catch (error) {
+    res.status(500).send('Server Error');
+  }
+};
+
 // Создание новой роли
 export const createPosition = async (req: Request, res: Response) => {
   try {

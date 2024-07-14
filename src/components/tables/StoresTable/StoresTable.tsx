@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../store/store";
 import {
@@ -52,10 +52,14 @@ const StoresTable: React.FC = () => {
   const [isStoreNameFilterActive, setIsStoreNameFilterActive] = useState(false);
   const [isAddressFilterActive, setIsAddressFilterActive] = useState(false);
   const [isDirectorFilterActive, setIsDirectorFilterActive] = useState(false);
+  const hasFetched = useRef(false); 
 
   useEffect(() => {
+    if (!hasFetched.current) {
     dispatch(fetchStores());
     dispatch(fetchEmployees({limit: 0, offset: 0}));
+    hasFetched.current = true;
+  }
   }, [dispatch]);
 
   const handleCreate = () => {

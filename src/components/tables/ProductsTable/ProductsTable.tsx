@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../store/store";
 import {
@@ -19,6 +19,11 @@ import {
   Button,
   TextField,
   IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import { Check, Close, Search } from "@mui/icons-material";
 
@@ -31,47 +36,56 @@ const ProductsTable: React.FC = () => {
   const [editId, setEditId] = useState<number | null>(null);
   const [editProductName, setEditProductName] = useState("");
   const [newProductName, setNewProductName] = useState("");
-  const [isAdding, setIsAdding] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("");
   const [isFiltering, setIsFiltering] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const hasFetched = useRef(false); // Новый флаг для предотвращения дублирования запроса
 
   useEffect(() => {
+    if (!hasFetched.current) {
     dispatch(fetchProducts());
+    hasFetched.current = true;
+  }
   }, [dispatch]);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setEditId(null);
+    setNewProductName("");
+    setEditProductName("");
+    setValidationError(null);
+    setIsEditing(false);
+  };
 
   const handleCreate = () => {
     if (validateProductName(newProductName)) {
       dispatch(createProduct({ productid: 0, productname: newProductName }));
-      setNewProductName("");
-      setIsAdding(false);
-      setValidationError(null);
+      handleClose();
     } else {
       setValidationError("Invalid product name");
     }
   };
 
-  const handleEdit = (product: Product) => {
+  const handleEditOpen = (product: Product) => {
     setEditId(product.productid);
     setEditProductName(product.productname);
-    setValidationError(null);
+    setIsEditing(true);
+    handleOpen();
   };
 
-  const handleSave = (productid: number) => {
-    if (validateProductName(editProductName)) {
-      console.log("editProductName ", productid);
-      
-      dispatch(updateProduct({ productid, productname: editProductName }));
-      setEditId(null);
-      setValidationError(null);
+  const handleSave = () => {
+    if (validateProductName(editProductName) && editId !== null) {
+      dispatch(updateProduct({ productid: editId, productname: editProductName }));
+      handleClose();
     } else {
       setValidationError("Invalid product name");
     }
-  };
-
-  const handleCancel = () => {
-    setEditId(null);
-    setValidationError(null);
   };
 
   const validateProductName = (name: string) => {
@@ -128,97 +142,63 @@ const ProductsTable: React.FC = () => {
         <TableBody>
           {filteredProducts.map((product) => (
             <TableRow key={product.productid}>
-              {/* <TableCell>
-                {editId === product.productid ? (
-                  <TextField value={product.productid} disabled />
-                ) : (
-                  product.productid
-                )}
-              </TableCell> */}
               <TableCell>{product.productid}</TableCell>
+              <TableCell>{product.productname}</TableCell>
               <TableCell>
-                {editId === product.productid ? (
-                  <TextField
-                    value={editProductName}
-                    onChange={(e) => setEditProductName(e.target.value)}
-                    error={!!validationError}
-                    helperText={validationError}
-                  />
-                ) : (
-                  product.productname
-                )}
-              </TableCell>
-              <TableCell>
-                {editId === product.productid ? (
-                  <>
-                    <IconButton
-                      onClick={() => handleSave(product.productid)}
-                      color="primary"
-                    >
-                      <Check />
-                    </IconButton>
-                    <IconButton onClick={handleCancel} color="secondary">
-                      <Close />
-                    </IconButton>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      onClick={() => handleEdit(product)}
-                      variant="contained"
-                      color="primary"
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      onClick={() => handleDelete(product.productid)}
-                      variant="contained"
-                      color="secondary"
-                    >
-                      Delete
-                    </Button>
-                  </>
-                )}
+                <Button
+                  onClick={() => handleEditOpen(product)}
+                  variant="contained"
+                  color="primary"
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => handleDelete(product.productid)}
+                  variant="contained"
+                  color="secondary"
+                >
+                  Delete
+                </Button>
               </TableCell>
             </TableRow>
           ))}
-          {isAdding && (
-            <TableRow>
-              <TableCell></TableCell>
-              <TableCell>
-                <TextField
-                  placeholder="Enter new product name"
-                  value={newProductName}
-                  onChange={(e) => setNewProductName(e.target.value)}
-                  error={!!validationError}
-                  helperText={validationError}
-                />
-              </TableCell>
-              <TableCell>
-                <IconButton onClick={handleCreate} color="primary">
-                  <Check />
-                </IconButton>
-                <IconButton
-                  onClick={() => setIsAdding(false)}
-                  color="secondary"
-                >
-                  <Close />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          )}
         </TableBody>
       </Table>
-      {!isAdding && (
-        <Button
-          onClick={() => setIsAdding(true)}
-          variant="contained"
-          color="primary"
-          style={{ marginTop: "10px" }}
-        >
-          Add Product
-        </Button>
-      )}
+      <Button
+        onClick={handleOpen}
+        variant="contained"
+        color="primary"
+        style={{ marginTop: "10px" }}
+      >
+        Add Product
+      </Button>
+
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>{isEditing ? "Edit Product" : "Add New Product"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Fill out the form.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Product Name"
+            value={isEditing ? editProductName : newProductName}
+            onChange={(e) => isEditing ? setEditProductName(e.target.value) : setNewProductName(e.target.value)}
+            error={!!validationError}
+            helperText={validationError}
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={isEditing ? handleSave : handleCreate} color="primary">
+            {isEditing ? "Save" : "Add"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

@@ -4,12 +4,13 @@
   justify-content: space-between;
 }
 
-button:focus {
-  // color: rgb(6, 81, 194) !important; 
-}
-
 .navBtn {
   color: white !important;
-//   color: rgb(6, 81, 194) !important;
-outline: none !important;
+  text-decoration: none;
+  outline: none !important;
+}
+
+.activeNavBtn {
+  color: rgb(245, 11, 245) !important;
+  text-decoration: underline;
 }

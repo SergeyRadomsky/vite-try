@@ -5,6 +5,10 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 export interface Position {
   id: number;
   positionname: string;
+	salarycoeff?: number;
+  notes?: string | null;
+  status?: boolean | null;
+  date?: Date | null;
 }
 
 export type CreatePositionData =  Omit<Position, "id">;
@@ -23,6 +27,12 @@ const initialState: PositionsState = {
 
 export const fetchPositions = createAsyncThunk('positions/fetchPositions', async () => {
   const response = await fetch('/api/positions');
+  const data = await response.json();
+  return data;
+});
+
+export const fetchPositionById = createAsyncThunk('positions/fetchPositionById', async (id: number) => {
+  const response = await fetch(`/api/positions/${id}`);
   const data = await response.json();
   return data;
 });
@@ -75,6 +85,23 @@ const positionsSlice = createSlice({
       .addCase(fetchPositions.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch positions';
+      })
+      .addCase(fetchPositionById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPositionById.fulfilled, (state, action) => {
+        state.loading = false;
+        const existingPositionIndex = state.data.findIndex(pos => pos.id === action.payload.id);
+        if (existingPositionIndex !== -1) {
+          state.data[existingPositionIndex] = action.payload;
+        } else {
+          state.data.push(action.payload);
+        }
+      })
+      .addCase(fetchPositionById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch position';
       })
       .addCase(createPosition.fulfilled, (state, action) => {
         state.data.push(action.payload);

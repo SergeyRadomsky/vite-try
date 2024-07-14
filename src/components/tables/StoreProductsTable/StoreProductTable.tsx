@@ -1,24 +1,49 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store/store';
-import { Table, TableBody, TableCell, TableHead, TableRow, CircularProgress, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-import { fetchStores } from '../../../store/stores/reducer';
-import { fetchProducts } from '../../../store/products/reducer';
-import { fetchStoreProducts } from '../../../store/storeproducts/reducer';
-import { selectProducts, selectStoreProducts, selectStores } from '../../../store/storeproducts/selector';
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  CircularProgress,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
+import { fetchStores } from "../../../store/stores/reducer";
+import { fetchProducts } from "../../../store/products/reducer";
+import { fetchStoreProducts } from "../../../store/storeproducts/reducer";
+import {
+  selectProducts,
+  selectStoreProducts,
+  selectStores,
+} from "../../../store/storeproducts/selector";
 
 const StoreProductsTable: React.FC = () => {
   const dispatch = useDispatch();
-  const { data: storeproducts, loading, error } = useSelector((state: RootState) => state.storeproducts);
+  const {
+    data: storeproducts,
+    loading,
+    error,
+  } = useSelector((state: RootState) => state.storeproducts);
   const stores = useSelector(selectStores);
   const products = useSelector(selectProducts);
 
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
-  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(
+    null
+  );
+  const hasFetched = useRef(false); // Новый флаг для предотвращения дублирования запроса
 
   useEffect(() => {
-    dispatch(fetchStores());
-    dispatch(fetchProducts());
+    if (!hasFetched.current) {
+      dispatch(fetchStores());
+      dispatch(fetchProducts());
+      hasFetched.current = true;
+    }
   }, [dispatch]);
 
   useEffect(() => {
@@ -33,12 +58,12 @@ const StoreProductsTable: React.FC = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', marginBottom: '20px' }}>
-        <FormControl style={{ marginRight: '10px', minWidth: 200 }}>
+      <div style={{ display: "flex", marginBottom: "20px" }}>
+        <FormControl style={{ marginRight: "10px", minWidth: 200 }}>
           <InputLabel id="store-filter-label">Store</InputLabel>
           <Select
             labelId="store-filter-label"
-            value={selectedStoreId || ''}
+            value={selectedStoreId || ""}
             onChange={(e) => setSelectedStoreId(e.target.value as number)}
           >
             <MenuItem value="">
@@ -51,11 +76,11 @@ const StoreProductsTable: React.FC = () => {
             ))}
           </Select>
         </FormControl>
-        <FormControl style={{ marginRight: '10px', minWidth: 200 }}>
+        <FormControl style={{ marginRight: "10px", minWidth: 200 }}>
           <InputLabel id="product-filter-label">Product</InputLabel>
           <Select
             labelId="product-filter-label"
-            value={selectedProductId || ''}
+            value={selectedProductId || ""}
             onChange={(e) => setSelectedProductId(e.target.value as number)}
           >
             <MenuItem value="">

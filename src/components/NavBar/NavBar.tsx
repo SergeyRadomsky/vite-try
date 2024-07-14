@@ -4,6 +4,7 @@ import s from "./navbar.module.scss";
 
 const Navbar = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [activePath, setActivePath] = useState(window.location.pathname);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -19,16 +20,47 @@ const Navbar = () => {
     }
   }, [isDarkMode]);
 
+  useEffect(() => {
+    const handlePopState = () => {
+      setActivePath(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
   return (
     <>
       <AppBar style={{ backgroundColor: isDarkMode ? '#555' : '#3f51b5' }}>
         <Toolbar className={s.navbar}>
           <ButtonGroup>
-            <a href="/stores"> <Button variant="text" className={s.navBtn}>Stores</Button></a>
-            <a href="/employees"> <Button variant="text" className={s.navBtn}>Employees</Button></a>
-            <a href="/products"> <Button variant="text" className={s.navBtn}>Products</Button></a>
-            <a href="/positions"> <Button variant="text" className={s.navBtn}>Positions</Button></a>
-            <a href="/store-products"> <Button variant="text" className={s.navBtn}>Store products</Button></a>
+            <a href="/stores">
+              <Button variant="text" className={activePath === '/stores' || activePath === '/' ? s.activeNavBtn : s.navBtn}>
+                Stores
+              </Button>
+            </a>
+            <a href="/employees">
+              <Button variant="text" className={activePath === '/employees' ? s.activeNavBtn : s.navBtn}>
+                Employees
+              </Button>
+            </a>
+            <a href="/products">
+              <Button variant="text" className={activePath === '/products' ? s.activeNavBtn : s.navBtn}>
+                Products
+              </Button>
+            </a>
+            <a href="/positions">
+              <Button variant="text" className={activePath === '/positions' ? s.activeNavBtn : s.navBtn}>
+                Positions
+              </Button>
+            </a>
+            <a href="/store-products">
+              <Button variant="text" className={activePath === '/store-products' ? s.activeNavBtn : s.navBtn}>
+                Store products
+              </Button>
+            </a>
           </ButtonGroup>
           <Button variant="text" className={s.navBtn} onClick={toggleDarkMode}>
             {isDarkMode ? 'Light mode' : 'Dark mode'}
