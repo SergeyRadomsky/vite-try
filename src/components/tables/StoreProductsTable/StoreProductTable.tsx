@@ -36,21 +36,25 @@ const StoreProductsTable: React.FC = () => {
   const [selectedProductId, setSelectedProductId] = useState<number | null>(
     null
   );
-  const hasFetched = useRef(false); // Новый флаг для предотвращения дублирования запроса
+  const hasFetchedStores = useRef(false); // Новый флаг для предотвращения дублирования запроса
+  const hasFetchedStPr = useRef(false); // Новый флаг для предотвращения дублирования запроса
 
   useEffect(() => {
-    if (!hasFetched.current) {
+    if (!hasFetchedStores.current) {
       dispatch(fetchStores());
       dispatch(fetchProducts());
-      hasFetched.current = true;
+      hasFetchedStores.current = true;
     }
   }, [dispatch]);
 
   useEffect(() => {
-    const filters: any = {};
-    if (selectedStoreId) filters.storeId = selectedStoreId;
-    if (selectedProductId) filters.productId = selectedProductId;
-    dispatch(fetchStoreProducts(filters));
+    if (!hasFetchedStPr.current) {
+      const filters: any = {};
+      if (selectedStoreId) filters.storeId = selectedStoreId;
+      if (selectedProductId) filters.productId = selectedProductId;
+      dispatch(fetchStoreProducts(filters));
+      hasFetchedStPr.current = true;
+    }
   }, [dispatch, selectedStoreId, selectedProductId]);
 
   if (loading) return <CircularProgress />;

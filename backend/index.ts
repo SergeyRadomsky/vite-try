@@ -5,9 +5,24 @@ import storesRoutes from "./routes/storesRoutes";
 import positionsRoutes from "./routes/positionsRoutes";
 import productsRoutes from "./routes/productsRoutes";
 import storeProductsRoutes from "./routes/storeProductsRoutes";
+import userRoutes from './routes/userRoutes'; // Новый маршрут для пользователей
+import roleRoutes from './routes/roleRoutes'; // Новый маршрут для ролей
+// import userRoleRoutes from './routes/userRoleRoutes';
+import authRoutes from './routes/authRoutes'
+// import * as dotenv from 'dotenv';
+ // Новый маршрут для user_roles
+var cors = require('cors')
+// dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+const corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions))
 
 app.use(bodyParser.json());
 
@@ -18,6 +33,11 @@ app.use("/", storesRoutes);
 app.use("/positions", positionsRoutes);
 app.use("/products", productsRoutes);
 app.use("/store-products", storeProductsRoutes);
+app.use('/users', userRoutes); // Подключаем маршрут для пользователей
+app.use('/roles', roleRoutes); // Подключаем маршрут для ролей
+app.use("/auth", authRoutes)
+// app.use('/user-roles', userRoleRoutes); // Подключаем маршрут для user_roles
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

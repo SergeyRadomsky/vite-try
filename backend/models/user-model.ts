@@ -1,5 +1,5 @@
 import { sequelize } from '../sequelize';
-import { DataTypes, Model } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 
 class User extends Model {
   public id!: number;
@@ -7,36 +7,42 @@ class User extends Model {
   public login!: string;
   public password!: string;
   public email!: string;
+  public refreshToken!: string; // Новое поле
 }
 
-User.init({
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
+User.init(
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    username: {
+      type: new DataTypes.STRING(128),
+      // allowNull: false,
+    },
+    login: {
+      type: new DataTypes.STRING(128),
+      // allowNull: false,
+    },
+    password: {
+      type: new DataTypes.STRING(128),
+      // allowNull: false,
+    },
+    email: {
+      type: new DataTypes.STRING(128),
+      // allowNull: false,
+    },
+    token: {
+      type: new DataTypes.STRING(128),
+      // allowNull: false,
+    },
   },
-  username: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  login: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
-}, {
-  sequelize,
-  tableName: 'users',
-  timestamps: false, // Отключение временных меток
-});
+  {
+    timestamps: false,
+    tableName: 'users',
+    sequelize, 
+  }
+);
 
 export default User;

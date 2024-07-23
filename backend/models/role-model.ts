@@ -2,8 +2,7 @@ import { sequelize } from '../sequelize';
 import { DataTypes, Model } from 'sequelize';
 
 class Role extends Model {
-  public id!: number;
-  public role!: string;
+  id: number;
 }
 
 Role.init({

@@ -3,10 +3,7 @@ import { sequelize } from '../sequelize';
 import User from './user-model';
 import Role from './role-model';
 
-class UserRole extends Model {
-  public userId!: number;
-  public roleId!: number;
-}
+class UserRole extends Model {}
 
 UserRole.init({
   userId: {
@@ -16,6 +13,7 @@ UserRole.init({
       key: 'id',
     },
     primaryKey: true,
+    field: 'user_id',
   },
   roleId: {
     type: DataTypes.INTEGER,
@@ -24,13 +22,12 @@ UserRole.init({
       key: 'id',
     },
     primaryKey: true,
+    field: 'role_id',
   },
 }, {
   sequelize,
   tableName: 'user_roles',
+  timestamps: false, // Отключение временных меток
 });
-
-User.belongsToMany(Role, { through: UserRole, foreignKey: 'userId' });
-Role.belongsToMany(User, { through: UserRole, foreignKey: 'roleId' });
 
 export default UserRole;

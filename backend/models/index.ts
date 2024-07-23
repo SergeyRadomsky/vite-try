@@ -20,7 +20,12 @@ Products.belongsToMany(Stores, { through: StoresProducts, foreignKey: 'productid
 StoresProducts.belongsTo(Products, { foreignKey: 'productid', as: 'product' });
 StoresProducts.belongsTo(Stores, { foreignKey: 'storeid', as: 'store' });
 
-User.belongsToMany(Role, { through: UserRole, foreignKey: 'userId' });
-Role.belongsToMany(User, { through: UserRole, foreignKey: 'roleId' });
+// Установка ассоциаций многие-ко-многим
+User.belongsToMany(Role, { through: UserRole, foreignKey: 'userId'});
+Role.belongsToMany(User, { through: UserRole, foreignKey: 'roleId'});
+
+// Установка ассоциаций для промежуточной таблицы
+UserRole.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+UserRole.belongsTo(Role, { foreignKey: 'roleId', as: 'role' });
 
 export { Stores, Employees, Positions, Products, StoresProducts };

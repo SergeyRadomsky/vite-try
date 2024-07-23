@@ -28,19 +28,46 @@ export const getEmployees = async (req: Request, res: Response) => {
   }
 };
 
-// Создание нового сотрудника
 export const createEmployee = [
   ...employeeValidationRules(),
   validate,
   async (req: Request, res: Response) => {
     try {
+      const { firstname, lastname, surname, bod } = req.body;
+      const existingEmployee = await Employees.findOne({
+        where: { firstname, lastname, surname, bod }
+      });
+
+      if (existingEmployee) {
+        return res.status(400).json({
+          errors: [
+            {
+              type: "field",
+              value: firstname,
+              msg: "Employee with this full name and date of birth already exists",
+              path: "firstname",
+              location: "body",
+              existingEmployee
+            }
+          ]
+        });
+      }
+
       const newEmployee = await Employees.create(req.body);
+      await newEmployee.reload({
+        include: [
+          { model: Positions, as: "position", attributes: ["positionname"] },
+          { model: Stores, as: "store", attributes: ["storename"] },
+        ],
+      });
       res.json(newEmployee);
     } catch (error) {
+      console.error(error);
       res.status(400).json({ error: "Validation Error" });
     }
   }
 ];
+
 
 export const updateEmployee = [
   ...employeeValidationRules(),

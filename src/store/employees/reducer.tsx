@@ -61,17 +61,30 @@ export const fetchEmployees = createAsyncThunk(
   }
 );
 
-export const createEmployee = createAsyncThunk('employees/createEmployee', async (employee: Omit<Employee, 'employeeid' | 'position' | 'store'>) => {
-  const response = await fetch('/api/employees', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(employee),
-  });
-  const data = await response.json();
-  return data;
-});
+export const createEmployee = createAsyncThunk(
+  'employees/createEmployee',
+  async (employee: Omit<Employee, 'employeeid' | 'position' | 'store'>, { rejectWithValue }) => {
+    try {
+      const response = await fetch('/api/employees', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(employee),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue({ message: 'An unexpected error occurred.' });
+    }
+  }
+);
 
 export const updateEmployee = createAsyncThunk('employees/updateEmployee', async (employee: Partial<Employee>) => {
   const response = await fetch(`/api/employees/${employee.employeeid}`, {

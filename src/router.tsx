@@ -7,6 +7,8 @@ import ProductsTable from './components/tables/ProductsTable/ProductsTable';
 import StoresTable from './components/tables/StoresTable/StoresTable';
 import StoreProductsTable from './components/tables/StoreProductsTable/StoreProductTable';
 import PositionEdit from './components/tables/PositionEdit/PositionEdit';
+import UserTable from './components/tables/UserTable/UserTable';
+import AuthForm from './components/Auth/AuthForm';
 
 
 const router = createBrowserRouter([
@@ -21,7 +23,10 @@ const router = createBrowserRouter([
       { path: '/products', element: <ProductsTable /> },
       { path: '/stores', element: <StoresTable /> },
       { path: '/store-products', element: <StoreProductsTable /> },
-      // { path: '/', element: <StoresTable /> },
+      { path: '/users', element: <UserTable /> },
+      { path: '/authorization', element: <AuthForm isLogin={false} /> },
+      // { path: '/authorization', element: <AuthForm isLogin={false} /> },
+      // { path: '/authorization', element: <AuthForm isLogin={} /> },
     ],
   },
 ]);
