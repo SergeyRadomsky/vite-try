@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import fetchWithAuth from '../../utils/fetchWithAuth';
 
 export interface StoreProduct {
   id: number;
@@ -28,13 +29,13 @@ export const fetchStoreProducts = createAsyncThunk('storeProducts/fetchStoreProd
     query += `productId=${filters.productId}&`;
   }
 
-  const response = await fetch(`/api/store-products?${query}`);
+  const response = await fetchWithAuth(`/api/store-products?${query}`);
   const data = await response.json();
   return data;
 });
 
 export const createStoreProduct = createAsyncThunk('storeProducts/createStoreProduct', async (storeProduct: Omit<StoreProduct, 'id'>) => {
-  const response = await fetch('/api/store-products', {
+  const response = await fetchWithAuth('/api/store-products', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -46,7 +47,7 @@ export const createStoreProduct = createAsyncThunk('storeProducts/createStorePro
 });
 
 export const updateStoreProduct = createAsyncThunk('storeProducts/updateStoreProduct', async (storeProduct: StoreProduct) => {
-  const response = await fetch(`/api/store-products/${storeProduct.id}`, {
+  const response = await fetchWithAuth(`/api/store-products/${storeProduct.id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -58,7 +59,7 @@ export const updateStoreProduct = createAsyncThunk('storeProducts/updateStorePro
 });
 
 export const deleteStoreProduct = createAsyncThunk('storeProducts/deleteStoreProduct', async (id: number) => {
-  await fetch(`/api/store-products/${id}`, {
+  await fetchWithAuth(`/api/store-products/${id}`, {
     method: 'DELETE',
   });
   return id;

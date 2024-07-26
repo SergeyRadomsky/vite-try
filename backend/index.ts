@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import employeesRoutes from "./routes/employeesRoutes";
@@ -9,11 +12,8 @@ import userRoutes from './routes/userRoutes'; // Новый маршрут дл�
 import roleRoutes from './routes/roleRoutes'; // Новый маршрут для ролей
 // import userRoleRoutes from './routes/userRoleRoutes';
 import authRoutes from './routes/authRoutes'
-// import * as dotenv from 'dotenv';
  // Новый маршрут для user_roles
 var cors = require('cors')
-// dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -40,5 +40,7 @@ app.use("/auth", authRoutes)
 
 
 app.listen(PORT, () => {
+  // console.log('Loaded ENV variables:', process.env);
+  console.log('Loaded ENV variables:', process.env.ACCESS_TOKEN_SECRET, process.env.REFRESH_TOKEN_SECRET);
   console.log(`Server is running on port ${PORT}`);
 });

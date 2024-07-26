@@ -15,6 +15,7 @@ import {
   FormControlLabel,
   Link,
 } from "@mui/material";
+import { startLoading, stopLoading } from "../../../store/Loader/reducer";
 
 const PositionEdit: React.FC = () => {
   const dispatch = useDispatch();
@@ -60,6 +61,16 @@ const PositionEdit: React.FC = () => {
       setEditDate(position.date ? new Date(position.date).toISOString().split("T")[0] : "");
     }
   }, [position]);
+
+  useEffect(() => {
+    console.log(error, loading);
+    if (error || loading) {
+      dispatch(startLoading());
+    } else {
+      dispatch(stopLoading());
+    }
+  }, [error, loading]);
+
 
   const validate = () => {
     const newErrors = {

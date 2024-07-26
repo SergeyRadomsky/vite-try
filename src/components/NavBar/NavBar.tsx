@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
 import { AppBar, Button, Toolbar, ButtonGroup } from "@mui/material";
 import s from "./navbar.module.scss";
+import { useNavigate } from "react-router-dom";
+import { stopLoading } from "../../store/Loader/reducer";
+import { useDispatch } from "react-redux";
 
 const Navbar = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [activePath, setActivePath] = useState(window.location.pathname);
 
@@ -10,7 +15,10 @@ const Navbar = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  const handleLogOut = () => {localStorage.removeItem('access-token')};
+  const handleLogOut = () => {localStorage.removeItem('access-token')
+    dispatch(stopLoading());
+    navigate("/authorization");
+  };
 
   useEffect(() => {
     if (isDarkMode) {

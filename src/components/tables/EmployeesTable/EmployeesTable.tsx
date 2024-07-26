@@ -34,6 +34,8 @@ import {
 import { fetchStores } from '../../../store/stores/reducer';
 import { fetchPositions } from '../../../store/positions/reducer';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { SelectIsLoadingLoader } from '../../../store/Loader/selector';
+import { startLoading, stopLoading } from '../../../store/Loader/reducer';
 
 const EmployeesTable: React.FC = () => {
   const dispatch = useDispatch();
@@ -88,11 +90,20 @@ const EmployeesTable: React.FC = () => {
       dispatch(fetchPositions());
       hasFetched.current = true;
     }
-  }, [dispatch, page, rowsPerPage]);
+  }, [page, rowsPerPage]);
 
   useEffect(() => {
     dispatch(fetchEmployees({ limit: rowsPerPage, offset: page * rowsPerPage }));
-  }, [dispatch, page, rowsPerPage])
+  }, [page, rowsPerPage])
+
+  useEffect(() => {
+    console.log(error, loading);
+    if (error || loading) {
+      dispatch(startLoading());
+    } else {
+      dispatch(stopLoading());
+    }
+  }, [error, loading]);
 
   const handleOpen = () => {
     setOpen(true);
@@ -273,6 +284,8 @@ const EmployeesTable: React.FC = () => {
       (filterStoreId ? employee.storeid === filterStoreId : true) &&
       (filterPositionId ? employee.positionid === filterPositionId : true)
   );
+
+  console.log('loading', loading);
 
   if (loading) return <CircularProgress />;
   if (error) return <Typography color='error'>{error}</Typography>;

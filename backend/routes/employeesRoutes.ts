@@ -4,9 +4,10 @@ import authentication from '../middlewares/authentication';
 
 const router = Router();
 
+// router.get('/', getEmployees);
 router.get('/', authentication, getEmployees);
-router.post('/', createEmployee);
-router.put('/:employeeid', updateEmployee);
-router.delete('/:employeeid', deleteEmployee);
+router.post('/', authentication, createEmployee);
+router.put('/:employeeid', authentication, updateEmployee);
+router.delete('/:employeeid', authentication, deleteEmployee);
 
 export default router;

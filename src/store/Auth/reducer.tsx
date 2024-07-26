@@ -1,6 +1,7 @@
+// store/auth/reducer.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { RootState } from '../store';
+// import { RootState } from '../store';
 
 interface AuthState {
   token: string | null;
@@ -18,8 +19,9 @@ const initialState: AuthState = {
 
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
-  async ({ username, email, password }: { username: string; email: string; password: string }) => {
-    const response = await axios.post('/api/auth/registration', { username, email, password });
+  async ({ username, email, password, roles }: { username: string; email: string; password: string; roles: number[] }) => {
+    const response = await axios.post('/api/auth/registration', { username, email, password, roles });
+    localStorage.setItem('access-token', response.data.token);
     return response.data; 
   }
 );
@@ -28,7 +30,7 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }: { email: string; password: string }) => {
     const response = await axios.post('/api/auth/login', { email, password });
-    console.log(response.data);
+    localStorage.setItem('access-token', response.data.token);
     return response.data;
   }
 );
@@ -40,6 +42,7 @@ const authSlice = createSlice({
     logout(state) {
       state.token = null;
       state.userId = null;
+      localStorage.removeItem('access-token');
     },
   },
   extraReducers: (builder) => {

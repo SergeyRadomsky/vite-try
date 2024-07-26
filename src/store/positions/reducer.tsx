@@ -1,5 +1,6 @@
 // store/positions/reducer.tsx
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import fetchWithAuth from '../../utils/fetchWithAuth';
 // import { RootState } from '../store';
 
 export interface Position {
@@ -26,19 +27,19 @@ const initialState: PositionsState = {
 };
 
 export const fetchPositions = createAsyncThunk('positions/fetchPositions', async () => {
-  const response = await fetch('/api/positions');
+  const response = await fetchWithAuth('/api/positions');
   const data = await response.json();
   return data;
 });
 
 export const fetchPositionById = createAsyncThunk('positions/fetchPositionById', async (id: number) => {
-  const response = await fetch(`/api/positions/${id}`);
+  const response = await fetchWithAuth(`/api/positions/${id}`);
   const data = await response.json();
   return data;
 });
 
 export const createPosition = createAsyncThunk('positions/createPosition', async (newPosition: CreatePositionData) => {
-  const response = await fetch('/api/positions', {
+  const response = await fetchWithAuth('/api/positions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -50,7 +51,7 @@ export const createPosition = createAsyncThunk('positions/createPosition', async
 });
 
 export const updatePosition = createAsyncThunk('positions/updatePosition', async (updatedPosition: Position) => {
-  const response = await fetch(`/api/positions/${updatedPosition.id}`, {
+  const response = await fetchWithAuth(`/api/positions/${updatedPosition.id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -62,7 +63,7 @@ export const updatePosition = createAsyncThunk('positions/updatePosition', async
 });
 
 export const deletePosition = createAsyncThunk('positions/deletePosition', async (positionId: number) => {
-  await fetch(`/api/positions/${positionId}`, {
+  await fetchWithAuth(`/api/positions/${positionId}`, {
     method: 'DELETE',
   });
   return positionId;
@@ -75,14 +76,17 @@ const positionsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchPositions.pending, (state) => {
+        console.log('pending');
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchPositions.fulfilled, (state, action) => {
+        console.log('fulfilled');
         state.loading = false;
         state.data = action.payload;
       })
       .addCase(fetchPositions.rejected, (state, action) => {
+        console.log('rejected');
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch positions';
       })

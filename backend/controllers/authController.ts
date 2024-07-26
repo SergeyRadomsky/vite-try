@@ -11,9 +11,9 @@ const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 // Регистрация
 export const registerUser = async (req: Request, res: Response) => {
   await body("username").notEmpty().run(req);
-  // await body("email").isEmail().run(req);
-  // await body("password").notEmpty().run(req);
-  // await body("Roles").notEmpty().run(req);
+  await body("email").isEmail().run(req);
+  await body("password").notEmpty().run(req);
+  await body("roles").isArray({ min: 1 }).run(req);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -32,6 +32,7 @@ export const registerUser = async (req: Request, res: Response) => {
     if (existingUser) {
       return res.status(400).json({ message: "Email already exists" });
     }
+    
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
@@ -55,8 +56,10 @@ export const registerUser = async (req: Request, res: Response) => {
       );
     }
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
+    const token = jwt.sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET
+      , {
       expiresIn: "1h",
+      // expiresIn: "5s",
     });
 
     res.status(201).json({ token, userId: user.id });
@@ -87,7 +90,7 @@ export const loginUser = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
+    const token = jwt.sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "1h",
     });
     res.json({ token, userId: user.id });

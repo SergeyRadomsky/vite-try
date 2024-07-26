@@ -25,7 +25,8 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { Check, Close, Search } from "@mui/icons-material";
+import { Search } from "@mui/icons-material";
+import { startLoading, stopLoading } from "../../../store/Loader/reducer";
 
 const ProductsTable: React.FC = () => {
   const dispatch = useDispatch();
@@ -42,6 +43,16 @@ const ProductsTable: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const hasFetched = useRef(false); // Новый флаг для предотвращения дублирования запроса
+
+  useEffect(() => {
+    console.log(error, loading);
+    if (error || loading) {
+      dispatch(startLoading());
+    } else {
+      dispatch(stopLoading());
+    }
+  }, [error, loading]);
+
 
   useEffect(() => {
     if (!hasFetched.current) {

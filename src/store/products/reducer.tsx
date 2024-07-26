@@ -1,5 +1,6 @@
 // store/products/reducer.tsx
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import fetchWithAuth from '../../utils/fetchWithAuth';
 // import { RootState } from '../store';
 
 export interface Product {
@@ -20,13 +21,13 @@ const initialState: ProductsState = {
 };
 
 export const fetchProducts = createAsyncThunk('products/fetchProducts', async () => {
-  const response = await fetch('/api/products');
+  const response = await fetchWithAuth('/api/products');
   const data = await response.json();
   return data;
 });
 
 export const createProduct = createAsyncThunk('products/createProduct', async (newProduct: Product) => {
-  const response = await fetch('/api/products', {
+  const response = await fetchWithAuth('/api/products', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -38,7 +39,7 @@ export const createProduct = createAsyncThunk('products/createProduct', async (n
 });
 
 export const updateProduct = createAsyncThunk('products/updateProduct', async (updatedProduct: Product) => {
-  const response = await fetch(`/api/products/${updatedProduct.productid}`, {
+  const response = await fetchWithAuth(`/api/products/${updatedProduct.productid}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -50,7 +51,7 @@ export const updateProduct = createAsyncThunk('products/updateProduct', async (u
 });
 
 export const deleteProduct = createAsyncThunk('products/deleteProduct', async (productId: number) => {
-  await fetch(`/api/products/${productId}`, {
+  await fetchWithAuth(`/api/products/${productId}`, {
     method: 'DELETE',
   });
   return productId;

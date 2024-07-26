@@ -2,9 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { TextField, Button, MenuItem } from "@mui/material";
-import axios from "axios";
 import { fetchRolesError, fetchRolesStart, fetchRolesSuccess } from "../../store/roles/reducer";
 import { selectUserRoles } from "../../store/roles/selector";
+import { loginUser, registerUser } from "../../store/Auth/reducer";
+import { SelectIsLoadingLoader } from "../../store/Loader/selector";
+import { stopLoading } from "../../store/Loader/reducer";
+
 
 // Функция для получения ролей с сервера
 const fetchRoles = async () => {
@@ -24,6 +27,7 @@ const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
   const navigate = useNavigate();
   const roles = useSelector(selectUserRoles);
   const hasFetchedRoles = useRef(false);
+  const isLoading = useSelector(SelectIsLoadingLoader);
 
   useEffect(() => {
     if (!hasFetchedRoles.current) {
@@ -36,45 +40,76 @@ const AuthForm = ({ isLogin }: { isLogin: boolean }) => {
     }
   }, [dispatch]);
 
+
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await axios.post("/api/auth/login", {
-        email,
-        password,
+    dispatch(loginUser({ email, password }))
+      .unwrap()
+      .then(() => {
+        dispatch(stopLoading());
+        navigate("/employees");
+      })
+      .catch((error: any) => {
+        console.error("Error during authentication", error);
       });
-      console.log(response);
-      localStorage.setItem("access-token", response.data.token);
-
-      if (isLogin) {
-        navigate("/");
-      } else {
-        navigate("/stores");
-      }
-    } catch (error) {
-      console.error("Error during authentication", error);
-    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await axios.post("/api/auth/registration", {
-        username,
-        email,
-        password,
-        roles: selectedRoles,
+    dispatch(registerUser({ username, email, password, roles: selectedRoles }))
+      .unwrap()
+      .then(() => {
+        dispatch(stopLoading());
+        navigate("/employees");
+        // dispatch(startLoading());
+      })
+      .catch((error: any) => {
+        console.error("Error during registration", error);
       });
-
-      if (isLogin) {
-        navigate("/");
-      } else {
-        navigate("/stores");
-      }
-    } catch (error) {
-      console.error("Error during authentication", error);
-    }
   };
+  
+  
+  // const handleSignIn = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   try {
+  //     const response = await axios.post("/api/auth/login", {
+  //       email,
+  //       password,
+  //     });
+  //     console.log(response);
+  //     localStorage.setItem("access-token", response.data.token);
+
+  //     if (isLogin) {
+  //       navigate("/");
+  //     } else {
+  //       navigate("/stores");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during authentication", error);
+  //   }
+  // };
+
+  // const handleSignUp = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   try {
+  //     const response = await axios.post("/api/auth/registration", {
+  //       username,
+  //       email,
+  //       password,
+  //       roles: selectedRoles,
+  //     });
+  //     localStorage.setItem("access-token", response.data.token);
+
+  //     if (isLogin) {
+  //       navigate("/");
+  //     } else {
+  //       navigate("/stores");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during authentication", error);
+  //   }
+  // };
 
   return (
     <form>
