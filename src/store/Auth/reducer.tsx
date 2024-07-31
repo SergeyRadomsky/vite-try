@@ -7,7 +7,7 @@ interface AuthState {
   token: string | null;
   userId: string | null;
   loading: boolean;
-  error: string | null;
+  error: any | null;
 }
 
 const initialState: AuthState = {
@@ -19,19 +19,32 @@ const initialState: AuthState = {
 
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
-  async ({ username, email, password, roles }: { username: string; email: string; password: string; roles: number[] }) => {
-    const response = await axios.post('/api/auth/registration', { username, email, password, roles });
-    localStorage.setItem('access-token', response.data.token);
-    return response.data; 
+  async ({ username, email, password, roles }: { username: string; email: string; password: string; roles: number[] }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('/api/auth/registration', { username, email, password, roles });
+      localStorage.setItem('access-token', response.data.token);
+      console.log(response.data);
+      return response.data; 
+    } catch (err: any) {
+      console.log(err);
+      return rejectWithValue(err.response.data)
+    }
   }
 );
 
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
-  async ({ email, password }: { email: string; password: string }) => {
-    const response = await axios.post('/api/auth/login', { email, password });
-    localStorage.setItem('access-token', response.data.token);
+  async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('/api/auth/login', { email, password });
+      localStorage.setItem('access-token', response.data.token);
+      console.log(response.data);
     return response.data;
+    } catch (err: any) {
+      console.log(err);
+
+      return rejectWithValue(err.response.data);
+    }
   }
 );
 
@@ -71,7 +84,7 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to login';
+        state.error = action.error || 'Failed to login';
       });
   },
 });

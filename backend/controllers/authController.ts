@@ -9,93 +9,134 @@ import UserRole from "../models/user-role-model";
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
 // Регистрация
-export const registerUser = async (req: Request, res: Response) => {
-  await body("username").notEmpty().run(req);
-  await body("email").isEmail().run(req);
-  await body("password").notEmpty().run(req);
-  await body("roles").isArray({ min: 1 }).run(req);
-
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { username, email, password, roles } = req.body;
-  
-      const existingUsername = await User.findOne({ where: { username } });
-      if (existingUsername) {
-        return res.status(400).json({ message: "Username already exists" });
+export const registerUser = [
+  // Валидация полей и проверка существования username и email
+  body("username")
+    .notEmpty()
+    .withMessage("Username is required")
+    .custom(async (username) => {
+      const existingUser = await User.findOne({ where: { username } });
+      if (existingUser) {
+        throw new Error("Username already exists");
       }
+    }),
+  body("email")
+    .isEmail()
+    .withMessage("Invalid email address")
+    .custom(async (email) => {
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        throw new Error("Email already exists");
+      }
+    }),
+  body("password").notEmpty().withMessage("Password is required"),
+  body("roles")
+    .isArray({ min: 1 })
+    .withMessage("At least one role is required"),
 
-  try {
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({ message: "Email already exists" });
+  // Обработчик запроса
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-    
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({
-      username,
-      email,
-      password: hashedPassword,
-    });
+    const { username, email, password, roles } = req.body;
 
-    if (roles && roles.length > 0) {
-      const roleInstances = await Role.findAll({
-        where: {
-          id: roles,
-        },
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await User.create({
+        username,
+        email,
+        password: hashedPassword,
       });
 
-      await UserRole.bulkCreate(
-        roleInstances.map((role) => ({
-          userId: user.id,
-          roleId: role.id,
-        }))
+      if (roles && roles.length > 0) {
+        const roleInstances = await Role.findAll({
+          where: {
+            id: roles,
+          },
+        });
+
+        await UserRole.bulkCreate(
+          roleInstances.map((role) => ({
+            userId: user.id,
+            roleId: role.id,
+          }))
+        );
+      }
+
+      const token = jwt.sign(
+        { userId: user.id },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+          expiresIn: "1h",
+          // expiresIn: "5s",
+        }
       );
+
+      res.status(201).json({ token, userId: user.id });
+    } catch (error) {
+      console.error("Error registering user:", error);
+      res.status(500).json({ msg: "Error registering user" });
+    }
+  },
+];
+
+
+export const loginUser = [
+  body("email").isEmail().withMessage("Invalid email address"),
+  body("email")
+  .custom(async (email) => {
+      const existingUser = await User.findOne({ where: { email } });
+      if (!existingUser) {
+        throw new Error("Email no exists");
+      }
+    }),
+  body("password").notEmpty().withMessage("Password is required"),
+
+  // Обработчик запроса
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET
-      , {
-      expiresIn: "1h",
-      // expiresIn: "5s",
-    });
+    const { email, password } = req.body;
+    try {
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        return res
+          .status(401)
+          .json({
+            errors: [
+              { msg: "Invalid email", param: "email", location: "body" },
+            ],
+          });
+      }
 
-    res.status(201).json({ token, userId: user.id });
-  } catch (error) {
-    console.error("Error registering user:", error);
-    res.status(500).json({ message: "Error registering user" });
-  }
-};
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res
+          .status(401)
+          .json({
+            errors: [
+              { msg: "Invalid password", param: "password", location: "body" },
+            ],
+          });
+      }
 
-// Логин
-export const loginUser = async (req: Request, res: Response) => {
-  // await body("password").notEmpty().run(req);
-
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { email, password } = req.body;
-  try {
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return res.status(401).json({ message: "Invalid email" });
+      const token = jwt.sign(
+        { userId: user.id },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+          expiresIn: "1h",
+        }
+      );
+      res.json({ token, userId: user.id });
+    } catch (error) {
+      console.error("Error logging in user:", error);
+      res.status(500).json({ msg: "Error logging in user" });
     }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid password" });
-    }
-
-    const token = jwt.sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "1h",
-    });
-    res.json({ token, userId: user.id });
-  } catch (error) {
-    console.error("Error logging in user:", error);
-    res.status(500).json({ message: "Error logging in user" });
-  }
-};
+  },
+];
