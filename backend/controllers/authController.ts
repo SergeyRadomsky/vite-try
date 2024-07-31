@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-import { body, validationResult } from "express-validator";
+import { body, check, validationResult } from "express-validator";
 import User from "../models/user-model";
 import Role from "../models/role-model";
 import UserRole from "../models/user-role-model";
@@ -86,13 +86,16 @@ export const registerUser = [
 
 export const loginUser = [
   body("email").isEmail().withMessage("Invalid email address"),
-  body("email")
-  .custom(async (email) => {
-      const existingUser = await User.findOne({ where: { email } });
-      if (!existingUser) {
-        throw new Error("Email no exists");
-      }
-    }),
+  check("email").custom(async (email, { req }) => {
+    if (!validationResult(req).isEmpty()) {
+      // Skip this check if there are already errors
+      return;
+    }
+    const existingUser = await User.findOne({ where: { email } });
+    if (!existingUser) {
+      throw new Error("Email no exists");
+    }
+  }),
   body("password").notEmpty().withMessage("Password is required"),
 
   // Обработчик запроса
